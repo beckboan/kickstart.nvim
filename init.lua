@@ -6,6 +6,7 @@ if vim.g.vscode then
 else
   vim.g.maplocalleader = ' '
   require("custom.mappings")
+  require("custom.fold")
 
   -- Install package manager
   --    https://github.com/folke/lazy.nvim
@@ -74,7 +75,7 @@ else
     },
 
     -- Useful plugin to show you pending keybinds.
-    { 'folke/which-key.nvim', opts = {} },
+    { 'folke/which-key.nvim',  opts = {} },
     {
       -- Adds git related signs to the gutter, as well as utilities for managing changes
       'lewis6991/gitsigns.nvim',
@@ -88,7 +89,8 @@ else
           changedelete = { text = '~' },
         },
         on_attach = function(bufnr)
-          vim.keymap.set('n', '<leader>hp', require('gitsigns').preview_hunk, { buffer = bufnr, desc = 'Preview git hunk' })
+          vim.keymap.set('n', '<leader>hp', require('gitsigns').preview_hunk,
+            { buffer = bufnr, desc = 'Preview git hunk' })
 
           -- don't override the built-in and fugitive keymaps
           local gs = package.loaded.gitsigns
@@ -297,7 +299,8 @@ else
   vim.defer_fn(function()
     require('nvim-treesitter.configs').setup {
       -- Add languages to be installed here that you want installed for treesitter
-      ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim', 'bash' },
+      ensure_installed = { 'c', 'cpp', 'go', 'lua', 'python', 'rust', 'tsx', 'javascript', 'typescript', 'vimdoc', 'vim',
+        'bash' },
 
       -- Autoinstall languages that are not installed. Defaults to false (but you can change for yourself!)
       auto_install = false,
