@@ -181,6 +181,7 @@ else
     { import = 'plugins' },
   }, {})
 
+
   -- Set highlight on search
   vim.o.hlsearch = false
 
@@ -421,7 +422,6 @@ else
   --  define the property 'filetypes' to the map in question.
   local servers = {
     clangd = {
-      settings = { ColumnLimit = 200 },
     },
     -- gopls = {},
     -- pyright = {},
