@@ -1,59 +1,24 @@
-vim.g.mapleader = ' '
+--[[
 
-if vim.g.vscode then
-  vim.g.maplocalleader = ' '
-  require("mappings")
-else
-  vim.g.maplocalleader = ' '
-  require("mappings")
-  require("fold")
-
-  local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
-  if not vim.loop.fs_stat(lazypath) then
-    vim.fn.system {
-      'git',
-      'clone',
-      '--filter=blob:none',
-      'https://github.com/folke/lazy.nvim.git',
-      '--branch=stable', -- latest stable release
-      lazypath,
-    }
-  end
-  vim.opt.rtp:prepend(lazypath)
-
-  -- NOTE: Here is where you install your plugins.
-  --  You can configure plugins using the `config` key.
-  --
-  --  You can also configure plugins after the setup call,
-  --    as they will be available in your neovim runtime.
-  require('lazy').setup({
-    -- NOTE: First, some plugins that don't require any configuration
-
-    -- Git related plugins
-    'tpope/vim-fugitive',
-    'tpope/vim-rhubarb',
-
-    -- Detect tabstop and shiftwidth automatically
-    'tpope/vim-sleuth',
-
-    -- NOTE: This is where your plugins related to LSP can be installed.
-    --  The configuration is done below. Search for lspconfig to find it below.
-    {
-      -- LSP Configuration & Plugins
-      'neovim/nvim-lspconfig',
-      dependencies = {
-        -- Automatically install LSPs to stdpath for neovim
-        'williamboman/mason.nvim',
-        'williamboman/mason-lspconfig.nvim',
-
-        -- Useful status updates for LSP
-        -- NOTE: `opts = {}` is the same as calling `require('fidget').setup({})`
-        { 'j-hui/fidget.nvim', tag = 'legacy', opts = {} },
-
-        -- Additional lua configuration, makes nvim stuff amazing!
-        'folke/neodev.nvim',
-      },
-    },
+=====================================================================
+==================== READ THIS BEFORE CONTINUING ====================
+=====================================================================
+========                                    .-----.          ========
+========         .----------------------.   | === |          ========
+========         |.-""""""""""""""""""-.|   |-----|          ========
+========         ||                    ||   | === |          ========
+========         ||   KICKSTART.NVIM   ||   |-----|          ========
+========         ||                    ||   | === |          ========
+========         ||                    ||   |-----|          ========
+========         ||:Tutor              ||   |:::::|          ========
+========         |'-..................-'|   |____o|          ========
+========         `"")----------------(""`   ___________      ========
+========        /::::::::::|  |::::::::::\  \ no mouse \     ========
+========       /:::========|  |==hjkl==:::\  \ required \    ========
+========      '""""""""""""'  '""""""""""""'  '""""""""""'   ========
+========                                                     ========
+=====================================================================
+=====================================================================
 
     {
       -- Autocompletion
@@ -71,47 +36,9 @@ else
       },
     },
 
-    -- Useful plugin to show you pending keybinds.
-    { 'folke/which-key.nvim',  opts = {} },
-    {
-      -- Adds git related signs to the gutter, as well as utilities for managing changes
-      'lewis6991/gitsigns.nvim',
-      opts = {
-        -- See `:help gitsigns.txt`
-        signs = {
-          add = { text = '+' },
-          change = { text = '~' },
-          delete = { text = '_' },
-          topdelete = { text = '‾' },
-          changedelete = { text = '~' },
-        },
-        on_attach = function(bufnr)
-          vim.keymap.set('n', '<leader>hp', require('gitsigns').preview_hunk,
-            { buffer = bufnr, desc = 'Preview git hunk' })
-
-          -- don't override the built-in and fugitive keymaps
-          local gs = package.loaded.gitsigns
-          vim.keymap.set({ 'n', 'v' }, ']c', function()
-            if vim.wo.diff then
-              return ']c'
-            end
-            vim.schedule(function()
-              gs.next_hunk()
-            end)
-            return '<Ignore>'
-          end, { expr = true, buffer = bufnr, desc = 'Jump to next hunk' })
-          vim.keymap.set({ 'n', 'v' }, '[c', function()
-            if vim.wo.diff then
-              return '[c'
-            end
-            vim.schedule(function()
-              gs.prev_hunk()
-            end)
-            return '<Ignore>'
-          end, { expr = true, buffer = bufnr, desc = 'Jump to previous hunk' })
-        end,
-      },
-    },
+    Once you've done that, you can start exploring, configuring and tinkering to
+    make Neovim your own! That might mean leaving Kickstart just the way it is for a while
+    or immediately breaking it into modular pieces. It's up to you!
 
     {
       -- Theme inspired by Atom
@@ -449,41 +376,25 @@ else
 
   mason_lspconfig.setup {
     ensure_installed = vim.tbl_keys(servers),
-  }
+    }
 
-  mason_lspconfig.setup_handlers {
-    function(server_name)
-      require('lspconfig')[server_name].setup {
-        capabilities = capabilities,
-        on_attach = on_attach,
-        settings = servers[server_name],
-        filetypes = (servers[server_name] or {}).filetypes,
-      }
+      -- ... and there is more!
+      --  Check out: https://github.com/echasnovski/mini.nvim
     end,
-  }
-
-  -- [[ Configure nvim-cmp ]]
-  -- See `:help cmp`
-  local cmp = require 'cmp'
-  local luasnip = require 'luasnip'
-  require('luasnip.loaders.from_vscode').lazy_load()
-  luasnip.config.setup {}
-
-  cmp.setup {
-    snippet = {
-      expand = function(args)
-        luasnip.lsp_expand(args.body)
-      end,
-    },
-    mapping = cmp.mapping.preset.insert {
-      ['<C-n>'] = cmp.mapping.select_next_item(),
-      ['<C-p>'] = cmp.mapping.select_prev_item(),
-      ['<C-d>'] = cmp.mapping.scroll_docs(-4),
-      ['<C-f>'] = cmp.mapping.scroll_docs(4),
-      ['<C-Space>'] = cmp.mapping.complete {},
-      ['<CR>'] = cmp.mapping.confirm {
-        behavior = cmp.ConfirmBehavior.Replace,
-        select = true,
+  },
+  { -- Highlight, edit, and navigate code
+    'nvim-treesitter/nvim-treesitter',
+    build = ':TSUpdate',
+    opts = {
+      ensure_installed = { 'bash', 'c', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      -- Autoinstall languages that are not installed
+      auto_install = true,
+      highlight = {
+        enable = true,
+        -- Some languages depend on vim's regex highlighting system (such as Ruby) for indent rules.
+        --  If you are experiencing weird indenting issues, add the language to
+        --  the list of additional_vim_regex_highlighting and disabled languages for indent.
+        additional_vim_regex_highlighting = { 'ruby' },
       },
       ['<Tab>'] = cmp.mapping(function(fallback)
         if cmp.visible() then
